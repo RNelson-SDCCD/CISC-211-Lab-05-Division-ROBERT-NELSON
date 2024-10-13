@@ -14,7 +14,7 @@
 .type nameStr,%gnu_unique_object
     
 /*** STUDENTS: Change the next line to your name!  **/
-nameStr: .asciz "Inigo Montoya"  
+nameStr: .asciz "Robert Nelson"  
 
 .align   /* realign so that next mem allocations are on word boundaries */
  
@@ -80,7 +80,83 @@ asmFunc:
      * Use it to test the C test code */
     
     /*** STUDENTS: Place your code BELOW this line!!! **************/
-
+    
+    /* START set all outputs to zero */
+    ldr r2, =quotient
+    ldr r3, =0
+    str r3, [r2]
+    
+    ldr r2, =mod
+    ldr r3, =0
+    str r3, [r2]
+    
+    ldr r2, =we_have_a_problem
+    ldr r3, =0
+    str r3, [r2]
+    /* END set all outputs to zero */
+    
+    /* Store the values passed into r0 & r1 to address of
+     dividend and divisor */
+    ldr r2, =dividend
+    str r0, [r2]
+    
+    ldr r2, =divisor
+    str r1, [r2]
+    
+    /* Load the value of quotient, used later */
+    ldr r4, =quotient
+    ldr r3, [r4]
+    
+    /* If either input value is 0, we have a problem */
+    cmp r0, #0
+    beq problem
+    cmp r1, #0
+    beq problem
+    
+    /* Perform division by subtraction */
+    subtract:
+    /* If dividend > divisor, goto store that value
+     as modulo */
+    cmp r0, r1
+    blo mod_out
+    
+    /* Perform dividend - divisor */
+    sub r0, r0, r1
+    cmp r0, r1
+    
+    /* Iterate our quotient by 1; quotient is number
+     of times divisor goes into dividend evenly */
+    add r3, r3, 1
+    
+    /* If dividend > divisor, go back to start of loop */
+    bhs subtract
+    
+    /* Store the assigned, iterated value of quotient
+     into its address */
+    quotient_out:
+    str r3, [r4]
+    
+    /* Store the new value of dividend into address of
+     mod, as it is now our remainder/modulo */
+    mod_out:
+    ldr r2, =mod
+    str r0, [r2]
+    
+    /* Goto loading address of quotient into r0 as described */
+    b quot_addr_out
+    
+    /* We have a problem */
+    problem:
+    /* Assign value of 1 to we_have_a_problem, continue to
+     assigning address of quotient to r0 */
+    ldr r2, =we_have_a_problem
+    ldr r3, =1
+    str r3, [r2]
+    
+    quot_addr_out:
+    ldr r0, =quotient
+    
+    b done
     
     /*** STUDENTS: Place your code ABOVE this line!!! **************/
 
